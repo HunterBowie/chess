@@ -1,0 +1,12 @@
+
+Piece:
+    - image: Surface
+    - color: str
+
+
+
+Game:
+    board: list
+    player: str
+
+    

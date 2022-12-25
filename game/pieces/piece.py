@@ -1,48 +1,97 @@
-import pygame, constants
+import assets 
 
 class Piece:
-    def __init__(self, row, col, color, image):
-        self.row = row
-        self.col = col
+    def __init__(self, color, name):
         self.color = color
+        self.name = name    
+        self.image = assets.IMAGES[f"white_{name}"]
+        if color == "black":
+            self.image = assets.IMAGES[f"black_{name}"]
+        self.last_move_occupied = False
+        self.moved = False
 
-        self.image = image
-
-        self.rect = pygame.Rect(self.get_pos()[0], self.get_pos()[1],
-        constants.SQUARE_WIDTH, constants.SQUARE_WIDTH)
-
-        self.selected = False
-    
-    def get_pos(self):
-        return self.col*constants.SQUARE_WIDTH, self.row*constants.SQUARE_WIDTH
-
-    def render(self, screen):
-        screen.blit(self.image, (self.col*constants.SQUARE_WIDTH, self.row*constants.SQUARE_WIDTH))
-    
-    def check_move(self, row, col, board):
-        if row < 0 or col < 0:
+    def check_move(self, move, board, takes=True, must_take=False):
+        self.last_move_occupied = False
+        if move[0] < 0 or move[1] < 0:
             return False
 
-        if row > 7 or col > 7:
-            return False
-
-        for piece in board:
-            if piece.row == row and piece.col == col:
-                if piece.color != self.color:
+        try:
+            if board[move[0]][move[1]]:
+                self.last_move_occupied = True
+                if board[move[0]][move[1]].color != self.color and takes:
                     return True
                 return False
-        return True
-    
-    def get_single_line_move(self)
+            
+            if must_take:
+                return False
+            
+            return True
+            
+            
 
+        except IndexError:
+            return False
     
-    
-    def get_line_moves(self, board):
+    def get_line_moves(self, pos, board, jumps=False):
         moves = []
-        for row_offset in range(7):
-            for piece in board:
-                if piece.row == self.row+row_offset and piece.col == self.col:
-
-
-    def get_diagonal_moves(self, board):
-        pass
+        for row_change in range(1, 8):
+            move = pos[0]+row_change, pos[1]
+            if not self.check_move(move, board):
+                break
+            moves.append(move)
+            if self.last_move_occupied and not jumps:
+                break
+        for row_change in range(1, 8):
+            move = pos[0]-row_change, pos[1]
+            if not self.check_move(move, board):
+                break
+            moves.append(move)
+            if self.last_move_occupied and not jumps:
+                break
+        for col_change in range(1, 8):
+            move = pos[0], pos[1]+col_change
+            if not self.check_move(move, board):
+                break
+            moves.append(move)
+            if self.last_move_occupied and not jumps:
+                break
+        for col_change in range(1, 8):
+            move = pos[0], pos[1]-col_change
+            if not self.check_move(move, board):
+                break
+            moves.append(move)
+            if self.last_move_occupied and not jumps:
+                break
+        return moves
+    
+    def get_diagonal_moves(self, pos, board, jumps=False):
+        moves = []
+        for pos_change in range(1, 8):
+            move = pos[0]+pos_change, pos[1]+pos_change
+            if not self.check_move(move, board):
+                break
+            moves.append(move)
+            if self.last_move_occupied and not jumps:
+                break
+        for pos_change in range(1, 8):
+            move = pos[0]+pos_change, pos[1]-pos_change
+            if not self.check_move(move, board):
+                break
+            moves.append(move)
+            if self.last_move_occupied and not jumps:
+                break
+        for pos_change in range(1, 8):
+            move = pos[0]-pos_change, pos[1]+pos_change
+            if not self.check_move(move, board):
+                break
+            moves.append(move)
+            if self.last_move_occupied and not jumps:
+                break
+        for pos_change in range(1, 8):
+            move = pos[0]-pos_change, pos[1]-pos_change
+            if not self.check_move(move, board):
+                break
+            moves.append(move)
+            if self.last_move_occupied and not jumps:
+                break
+        return moves

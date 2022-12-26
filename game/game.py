@@ -5,10 +5,9 @@ class Game:
     def __init__(self, window):
         self.window = window
         self.board = [[None for i in range(8)] for i in range(8)]
-        self.board[5][5] = Centaur("white")
         self.init_pieces()
         self.possible_move_squares = []
-        self.selected = None
+        self.selected_pos = None
     
     def init_pieces(self):
         self.init_back_row(0, "black")
@@ -35,40 +34,31 @@ class Game:
         col = mouse_pos[0]//constants.SQUARE_WIDTH
         row = mouse_pos[1]//constants.SQUARE_WIDTH
         return row, col
-
     
     def eventloop(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.selected:
-                if self.get_mouse_board_pos() in self.possible_move_squares:
-                    row, col = self.selected
-                    piece = self.board[row][col]
-                    self.board[row][col] = None
-                    row, col = self.get_mouse_board_pos()
-                    self.board[row][col] = piece
-                    self.possible_move_squares.clear()
-                    self.selected = None
-                    piece.moved = True
-                else:
-                    row, col = self.get_mouse_board_pos()
-                    if (row, col) == self.selected:
-                        self.possible_move_squares.clear()
-                        self.selected = None
-                        return None
-                    piece = self.board[row][col]
-                    if piece:
-                        self.possible_move_squares = piece.get_moves((row, col), self.board)
-                        self.selected = row, col
-                
+            if self.get_mouse_board_pos() in self.possible_move_squares:
+                row, col = self.selected_pos
+                piece = self.board[row][col]
+                self.board[row][col] = None
+                row, col = self.get_mouse_board_pos()
+                self.board[row][col] = piece
+                self.possible_move_squares.clear()
+                self.selected_pos = None
+                piece.moved = True
                 
             else:
                 row, col = self.get_mouse_board_pos()
-                piece = self.board[row][col]
-                if piece:
-                    self.possible_move_squares = piece.get_moves((row, col), self.board)
-                    self.selected = row, col
-                    
-    
+                if (row, col) == self.selected_pos:
+                    self.possible_move_squares.clear()
+                    self.selected_pos = None
+                
+                else:
+                    piece = self.board[row][col]
+                    if piece:
+                        self.possible_move_squares = piece.get_moves((row, col), self.board)
+                        self.selected_pos = row, col
+     
     def draw_dot(self, pos):
         surf = pygame.Surface((constants.SQUARE_WIDTH, constants.SQUARE_WIDTH), pygame.SRCALPHA)
         pygame.draw.circle(surf, windowgui.Colors.GREY, (constants.SQUARE_WIDTH//2, constants.SQUARE_WIDTH//2), 15)

@@ -1,85 +1,47 @@
 import assets, constants, pygame, windowgui
-from game.pieces import Rook, Bishop, King, Queen, Knight, Pawn, Centaur
+from game.board import Board
 
-class Game:
+class Game:    
     def __init__(self, window):
         self.window = window
-        self.board = [[None for i in range(8)] for i in range(8)]
-        self.init_pieces()
-        self.possible_move_squares = []
-        self.selected_pos = None
-    
-    def init_pieces(self):
-        self.init_back_row(0, "black")
-        self.init_pawn_row(1, "black", "down")
-        self.init_pawn_row(6, "white", "up")
-        self.init_back_row(7, "white")
-    
-    def init_pawn_row(self, row, color, direction):
-        for col in range(8):
-            self.board[row][col] = Pawn(color, direction)
+        self.board = Board()
+        self.selected_piece = None
+        self.turn = "white"
 
-    def init_back_row(self, row, color):
-        self.board[row][0] = Rook(color)
-        self.board[row][1] = Knight(color)
-        self.board[row][2] = Bishop(color)
-        self.board[row][3] = Queen(color)
-        self.board[row][4] = King(color)
-        self.board[row][5] = Bishop(color)
-        self.board[row][6] = Knight(color)
-        self.board[row][7] = Rook(color)
-    
-    def get_mouse_board_pos(self):
-        mouse_pos = pygame.mouse.get_pos()
-        col = mouse_pos[0]//constants.SQUARE_WIDTH
-        row = mouse_pos[1]//constants.SQUARE_WIDTH
-        return row, col
-    
     def eventloop(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.get_mouse_board_pos() in self.possible_move_squares:
-                row, col = self.selected_pos
-                piece = self.board[row][col]
-                self.board[row][col] = None
-                row, col = self.get_mouse_board_pos()
-                self.board[row][col] = piece
-                self.possible_move_squares.clear()
-                self.selected_pos = None
-                piece.moved = True
+            moves = []
+            if self.selected_piece:
+                moves = self.board.get_moves(self.selected_piece)
+            if self.board.get_mouse_pos() in moves:
+                selected_pos = self.board.get_pos(self.selected_piece)
+                self.board.move_piece(selected_pos, self.board.get_mouse_pos())
+                self.selected_piece = None
+                if self.turn == "white":
+                    self.turn = "black"
+                else:
+                    self.turn = "white"
                 
             else:
-                row, col = self.get_mouse_board_pos()
-                if (row, col) == self.selected_pos:
-                    self.possible_move_squares.clear()
-                    self.selected_pos = None
+                if self.board.get_mouse_pos() == self.board.get_pos(self.selected_piece):
+                    self.selected_piece = None
                 
                 else:
+                    self.selected_piece = None
+
+                    row, col = self.board.get_mouse_pos()
                     piece = self.board[row][col]
                     if piece:
-                        self.possible_move_squares = piece.get_moves((row, col), self.board)
-                        self.selected_pos = row, col
-     
-    def draw_dot(self, pos):
-        surf = pygame.Surface((constants.SQUARE_WIDTH, constants.SQUARE_WIDTH), pygame.SRCALPHA)
-        pygame.draw.circle(surf, windowgui.Colors.GREY, (constants.SQUARE_WIDTH//2, constants.SQUARE_WIDTH//2), 15)
-        surf.set_alpha(100)
-        self.window.screen.blit(surf, pos)
+                        if piece.color == self.turn:
+                            self.selected_piece = piece
+        
+   
     
     def update(self):
-        for row in range(8):
-            for col in range(8):
-                pos = col*constants.SQUARE_WIDTH, row*constants.SQUARE_WIDTH
-                if (row + col) % 2 == 0:
-                    self.window.screen.blit(assets.IMAGES["light_square"], pos)
-                else:
-                    self.window.screen.blit(assets.IMAGES["dark_square"], pos)
-                
-                piece = self.board[row][col]
-                if piece:
-                    self.window.screen.blit(piece.image, pos)
+        self.board.render(self.window.screen, self.turn)
 
-                if (row, col) in self.possible_move_squares:
-                    self.draw_dot(pos)
+        if self.selected_piece:
+            self.board.render_move_dots(self.selected_piece, self.window.screen)
                
 
         

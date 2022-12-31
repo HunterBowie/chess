@@ -16,3 +16,13 @@ class King(Piece):
             if self.check_move(move, board):
                 moves.append(move)
         return moves
+    
+    def in_check(self, pos, board):
+        for row in range(8):
+            for col in range(8):
+                piece = board[row][col]
+                if piece is not None:
+                    if piece.color != self.color:
+                        if pos in piece.get_moves((row, col), board):
+                            return True
+        return False

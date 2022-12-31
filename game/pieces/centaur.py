@@ -9,5 +9,5 @@ class Centaur(Piece):
         super().__init__(color, "centaur")
     
     def get_moves(self, pos, board):
-        return King("white").get_moves(pos, board) + \
-            Knight("white").get_moves(pos, board)
+        return King(self.color).get_moves(pos, board) + \
+            Knight(self.color).get_moves(pos, board)

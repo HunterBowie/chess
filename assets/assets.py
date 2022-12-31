@@ -7,8 +7,8 @@ IMAGES_DIR = path.join(CURRENT_DIR, "images")
 
 
 IMAGES = {
-    "light_square": windowgui.load_image("light_square", IMAGES_DIR),
-    "dark_square": windowgui.load_image("dark_square", IMAGES_DIR),
+    "white_square": windowgui.load_image("white_square", IMAGES_DIR),
+    "black_square": windowgui.load_image("black_square", IMAGES_DIR),
     "white_rook": windowgui.load_image("white_rook", IMAGES_DIR),
     "black_rook": windowgui.load_image("black_rook", IMAGES_DIR),
     "white_knight": windowgui.load_image("white_knight", IMAGES_DIR),

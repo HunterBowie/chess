@@ -1,5 +1,5 @@
 from os import path
-import windowgui
+import windowgui, constants
 
 CURRENT_DIR = path.dirname(__file__)
 IMAGES_DIR = path.join(CURRENT_DIR, "images")
@@ -23,7 +23,7 @@ IMAGES = {
     "black_pawn": windowgui.load_image("black_pawn", IMAGES_DIR),
     "black_centaur": windowgui.load_image("black_centaur", IMAGES_DIR),
     "white_centaur": windowgui.load_image("white_centaur", IMAGES_DIR),
-        
+    "white_joker":  windowgui.load_image("white_joker", IMAGES_DIR, scale=(constants.SQUARE_WIDTH, constants.SQUARE_WIDTH)),
 }
 
 def convert_images():

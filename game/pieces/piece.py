@@ -13,7 +13,9 @@ class Piece:
     
     def get_image(self):
         return assets.IMAGES[self.color + "_" + self.rank]
-        
+    
+    def on_start_of_turn(self):
+        pass
 
     def check_move(self, move, board, takes=True, must_take=False):
         self._last_move_occupied = False

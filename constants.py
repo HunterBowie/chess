@@ -11,5 +11,9 @@ class BoardTheme:
     GREEN = 1
     RED = 2
 
+class PlayerType:
+    BOT = 0
+    HUMAN = 1
+
 
 

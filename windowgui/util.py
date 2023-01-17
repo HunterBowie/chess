@@ -1,4 +1,4 @@
-import pygame, time
+import pygame, time, threading
 from os import path
 from .constants import Colors
 
@@ -14,19 +14,24 @@ class Text:
         "color": Colors.BLACK
     }
 
-    def __init__(self, x, y, string, style=None, newline_width=None):
+    def __init__(self, x: int, y: int, string: str, 
+    style: dict = None, newline_width: int = None, root_center = False):
         self.style = style
         if self.style is None:
             self.style = self.default_style.copy()
         for setting, value in self.default_style.items():
             if setting not in self.style:
                 self.style[setting] = value
+        
         self.x = x
         self.y = y
         self.newline_width = newline_width
         self.set(string)
 
-    def set(self, string):
+        if root_center:
+            self.x, self.y = root_rect(self.get_rect(), center_x=True, center_y=True)
+
+    def set(self, string: str):
         self.raw_string = string
         self.lines = string.split("\n")
         self.string = string.replace("\n", "")
@@ -42,9 +47,9 @@ class Text:
                 if new_line:
                     new_lines.append(new_line.strip())
             self.lines = new_lines
-        self._load_surf()
+        self._load_surface()
     
-    def add(self, string):
+    def add(self, string: str):
         self.set(self.raw_string + string)
     
     def pop(self):
@@ -64,7 +69,7 @@ class Text:
     def get_rect(self):
         return pygame.Rect(self.x, self.y, self.get_width(), self.get_height())
     
-    def _load_surf(self):
+    def _load_surface(self):
         font = pygame.font.Font(self.style["font_file"], self.style["size"])
 
         if len(self.lines) > 1:
@@ -88,24 +93,25 @@ class Text:
         else:
             self.surface = font.render(self.string, self.style["antialias"], self.style["color"])
     
-    def render(self, screen):
-        screen.blit(self.surface, (self.x, self.y))
+    def render(self, surface: pygame.Surface):
+        surface.blit(self.surface, (self.x, self.y))
     
-    def center_y(self, rect):
+    def center_y(self, rect: pygame.Rect):
         self.y = rect.center[1]-self.get_height()/2
 
-    def center_x(self, rect):
+    def center_x(self, rect: pygame.Rect):
         self.x = rect.center[0]-self.get_width()/2
     
-    def center(self, rect):
+    def center(self, rect: pygame.Rect):
         self.center_x(rect)
         self.center_y(rect)
 
-def render_text_background(surface, text, color, alpha, margin):
-    surf = get_surf((text.get_width()+margin, text.get_height()+margin), color, alpha)
+def render_text_background(surface: pygame.Surface, text: Text,
+ color: tuple, alpha: int, margin):
+    surf = get_surface((text.get_width()+margin, text.get_height()+margin), color, alpha)
     surface.blit(surf, (int(text.x-margin/2), int(text.y-margin/2)))
 
-def get_text_size(string, style=Text.default_style):
+def get_text_size(string: str, style: dict = Text.default_style):
     if style != Text.default_style:
         for setting, value in Text.default_style.items():
             if setting not in style:
@@ -156,7 +162,7 @@ class Timer:
 
         return self.stop_time-self.start_time
     
-    def passed(self, seconds):
+    def passed(self, seconds: int):
         """
         Returns true if the timer has exceeded
         the given time.
@@ -164,42 +170,51 @@ class Timer:
         return self.get() >= seconds
     
     def stopped(self):
-
         return self.stop_time != -1
     
     def started(self):
         return self.start_time != -1
     
+    def _trigger(self, function, seconds: int):
+        timer = Timer()
+        timer.start()
+        while not timer.passed(seconds):
+            pass
+        function.__call__()
+    
+    def trigger(self, function, seconds: int):
+        threading.Thread(target=self._trigger, args=(function, seconds)).start()
+    
     def __repr__(self):
         return f"time: {self.get()}"
 
 
-def rotate_image(image, rect, angle):
-        """rotate an image while keeping its center"""
-        rot_image = pygame.transform.rotate(image, angle)
-        y = rect.center[1]-rot_image.get_height()/2
-        x = rect.center[0]-rot_image.get_width()/2
-        return rot_image, (x, y)
+def rotate_surface(surface: pygame.Surface, rect: pygame.Rect, angle: int):
+    """rotate a surface while keeping its center"""
+    rot_surface = pygame.transform.rotate(surface, angle)
+    y = rect.center[1]-rot_surface.get_height()/2
+    x = rect.center[0]-rot_surface.get_width()/2
+    return rot_surface, (x, y)
 
-def get_surf(size, color, alpha):
+def get_surface(size: tuple, color: tuple, alpha: int):
     surf = pygame.Surface(size, pygame.SRCALPHA)
     surf.fill(color)
     surf.set_alpha(alpha)
     return surf
 
 
-def render_border(surface, rect, size):
+def render_border(surface: pygame.Surface, rect: pygame.Rect, size: tuple):
     pygame.draw.line(surface, Colors.BLACK, rect.topleft, rect.topright, size)
     pygame.draw.line(surface, Colors.BLACK, rect.topleft, rect.bottomleft, size)
     pygame.draw.line(surface, Colors.BLACK, rect.bottomleft, rect.bottomright, size)
     pygame.draw.line(surface, Colors.BLACK, rect.topright, rect.bottomright, size)
 
-
-def root_rect(screen_size, rect, top=False, bottom=False,
-    left=False, right=False, center_x=False, center_y=False) -> (int, int):
+def root_rect(rect: pygame.Rect, top = False, bottom = False,
+    left = False, right = False, center_x = False, center_y = False) -> tuple:
     """
     A function for positioning a rect relative to the screen.
     """
+    screen_size = pygame.display.get_surface().get_size()
     center_pos = int(screen_size[0]/2), int(screen_size[1]/2)
     
     new_x, new_y = 0, 0
@@ -219,13 +234,8 @@ def root_rect(screen_size, rect, top=False, bottom=False,
     rect.y += new_y
     return rect.x, rect.y
 
-def root_rects(screen_size, rects, top=False, bottom=False,
-    left=False, right=False, center_x=False, center_y=False):
-    for rect in rects:
-        root_rect(screen_size, rect, top, bottom,
-        left, right, center_x, center_y)
-
-def load_image(img_name, img_dir, ext=".png", colorkey=None, convert=False, scale=None):
+def load_image(img_name: str, img_dir: str, ext=".png", colorkey: tuple = None,
+    convert = False, scale: tuple = None):
     full_path = path.join(img_dir, img_name) + ext
     try:
         img = pygame.image.load(full_path)

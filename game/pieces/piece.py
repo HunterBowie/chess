@@ -1,21 +1,24 @@
 import assets 
 
 class Piece:
-    def __init__(self, color, rank):
+    def __init__(self, color, name):
         self.color = color
-        self.rank = rank
+        self.name = name
         self.moved = False
 
         self._last_move_occupied = False
     
     def __repr__(self):
-        return self.color + " " + self.rank
+        return self.color + " " + self.name
     
     def get_image(self):
-        return assets.IMAGES[self.color + "_" + self.rank]
+        return assets.IMAGES[self.color + "_" + self.name]
     
     def on_start_of_turn(self):
         pass
+
+    def get_moves(self, pos, board):
+        return []
 
     def check_move(self, move, board, takes=True, must_take=False):
         self._last_move_occupied = False

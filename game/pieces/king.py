@@ -26,3 +26,4 @@ class King(Piece):
                         if pos in piece.get_moves((row, col), board):
                             return True
         return False
+    

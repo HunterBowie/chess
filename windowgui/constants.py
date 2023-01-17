@@ -26,17 +26,20 @@ class AssetType:
     SOUND = 2
     FONT = 3
 
-
-
-class UIColorStyle:
+class ColorStyle:
     WHITE = "white"
     RED = "red"
     GREEN = "green"
     YELLOW = "yellow"
     BLUE = "blue"
 
+class CheckBoxType:
+    TICK_SYMBOL = "tick"
+    CROSS_SYMBOL = "cross"
+    CHECK_SYMBOL = "checkmark"
 
-class UIEvent:
+
+class Event:
     NAMES = [
     "BUTTON_CLICKED", "BUTTON_RELEASED", "CHECKBOX_CLICKED",
     "TEXTBOX_POSTED", "TEXTBOX_SELECTED", "SLIDER_MOVED"

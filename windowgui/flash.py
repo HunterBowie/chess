@@ -1,12 +1,12 @@
 import pygame
-from .util import Timer
+from .util import Timer, Text
 from .constants import FLASH_FADE_SPEED, FLASH_FADE_TIME
 
 class Flash:
     """
     A class for temperarily rendering messages on the screen.
     """
-    def __init__(self, x, y, size, text, color, duration=2.3):
+    def __init__(self, x: int, y: int, size: tuple, text: Text, color: tuple, duration = 2.3):
         self.text = text
         self.alpha = 0
         self.x = x
@@ -46,7 +46,7 @@ class Flash:
     def is_finished(self):
         return self.timer.passed(self.duration)
     
-    def render(self, surface):
+    def render(self, surface: pygame.Surface):
         if self.timer.get() < FLASH_FADE_TIME:
             self._surf_fade_in()
         elif self.duration-self.timer.get() < FLASH_FADE_TIME:

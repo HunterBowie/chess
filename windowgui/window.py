@@ -14,7 +14,7 @@ class Window:
     class PublicManagerPlaceholder:
         pass
 
-    def __init__(self, screen_size):
+    def __init__(self, screen_size: tuple):
         self.screen = pygame.display.set_mode(screen_size)
         self.clock = pygame.time.Clock()
         self.running = False
@@ -30,7 +30,7 @@ class Window:
         self.flash = self._managers[self.FLASH_MANAGER]
         self.on_manager_change = lambda window : None
     
-    def set_manager(self, manager):
+    def set_manager(self, manager: object):
         if callable(self.on_manager_change):
             self.on_manager_change.__call__(self)
         self.ui.clear()
@@ -38,7 +38,7 @@ class Window:
             manager.init_ui()
         self._managers[self.PUBLIC_MANAGER] = manager
 
-    def get_manager(self, manager):
+    def get_manager(self):
         return self._managers[self.PUBLIC_MANAGER]
     
     def start(self, auto_cycle=False):
@@ -54,7 +54,7 @@ class Window:
                 manager.end()
         quit()
 
-    def eventloop(self, event):
+    def eventloop(self, event: pygame.event.Event):
         for manager in self._managers:
             if self._has_callable_attr(manager, "eventloop"):
                 manager.eventloop(event)
@@ -65,7 +65,7 @@ class Window:
                 self.end()
                 quit()
         
-    def update(self, auto_eventloop=False):
+    def update(self, auto_eventloop = False):
         if auto_eventloop:
             for event in pygame.event.get():
                 self.eventloop(event)

@@ -23,7 +23,8 @@ IMAGES = {
     "black_pawn": windowgui.load_image("black_pawn", IMAGES_DIR),
     "black_centaur": windowgui.load_image("black_centaur", IMAGES_DIR),
     "white_centaur": windowgui.load_image("white_centaur", IMAGES_DIR),
-    "white_joker":  windowgui.load_image("white_joker", IMAGES_DIR, scale=(constants.SQUARE_WIDTH, constants.SQUARE_WIDTH)),
+    "white_jester":  windowgui.load_image("white_jester", IMAGES_DIR, scale=(constants.SQUARE_WIDTH, constants.SQUARE_WIDTH)),
+    "black_jester":  windowgui.load_image("black_jester", IMAGES_DIR, scale=(constants.SQUARE_WIDTH, constants.SQUARE_WIDTH)),
 }
 
 def convert_images():

@@ -3,6 +3,7 @@ from game.pieces.knight import Knight
 from game.pieces.king import King
 from game.pieces.bishop import Bishop
 from game.pieces.rook import Rook
+from game.pieces.queen import Queen
 import assets, random
 
 
@@ -25,16 +26,24 @@ class Jester(Piece):
             self.moves.append(move)
             if not new_moves:
                 break
+        # self.moves = random.choice([
+        #     Rook(self.color).get_moves(pos, board),
+        #     Knight(self.color).get_moves(pos, board),
+        #     Bishop(self.color).get_moves(pos, board),
+        #     King(self.color).get_moves(pos, board),
+        #     Queen(self.color).get_moves(pos, board)
+        #     ])
+        
+        # for move in self.moves:
+        #     if type(board[move[0]][move[1]]) is King:
+        #         self.moves.remove(move)
     
     def on_start_of_turn(self):
         self.start_of_turn = True
     
     def get_moves(self, pos, board):
-        if self.start_of_turn or not self.moves:
+        if self.start_of_turn:
             self._change_moves(pos, board)
             self.start_of_turn = False
-        moves = []
-        for move in self.moves:
-            if not type(board[move[0]][move[1]]) is King:
-                moves.append(move)
-        return moves
+        
+        return self.moves

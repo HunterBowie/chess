@@ -34,6 +34,7 @@ class BotMenuManager:
         self.window = window
         self.color_buttons = None
         self.textbox = None
+        self.text = windowgui.Text(0,-200, "Computer", constants.TITLE_FONT_STYLE, root_center=True)
     
     def init_ui(self):
         white_button = windowgui.Button("white", 0, -100, 250, 50,
@@ -46,7 +47,7 @@ class BotMenuManager:
             [white_button, black_button]
         )
         self.textbox = windowgui.TextBox("botlevel", 0, 100, 250, 50)
-        self.textbox.text.set("2")
+        self.textbox.text.set("3")
         self.window.ui.add([self.color_buttons, start_button, self.textbox])
     
     def eventloop(self, event):
@@ -67,6 +68,9 @@ class BotMenuManager:
                 value = int(self.textbox.text.string)
                 
                 self.window.set_manager(GameManager(self.window, game.Game(white_player, black_player, bot_level=value)))
+    
+    def update(self):
+        self.text.render(self.window.screen)
 
 class GameManager:
     def __init__(self, window, game):
@@ -140,8 +144,6 @@ class EndManager:
         center_y=True, center_x=True)
         self.window.screen.blit(game_surf, (x, y))
         self.text.render(self.window.screen)
-
-
 
 
 window = windowgui.Window(constants.SCREEN_SIZE)

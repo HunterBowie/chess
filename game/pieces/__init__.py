@@ -5,6 +5,4 @@ from game.pieces.knight import Knight
 from game.pieces.pawn import Pawn
 from game.pieces.queen import Queen
 from game.pieces.king import King
-from game.pieces.centaur import Centaur
-from game.pieces.jester import Jester
-from game.pieces.cursed_pawn import CursedPawn
+from game.pieces.mods import CursedPawn, Centaur, Jester

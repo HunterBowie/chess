@@ -1,6 +1,6 @@
 import assets, constants, pygame, windowgui, time, random
 from game.board import Board
-import minimax
+import chessbot
 
 class Game:    
     def __init__(self, white_player: constants.PlayerType, 
@@ -8,6 +8,7 @@ class Game:
         self.white_player = white_player
         self.black_player = black_player
         self.board = Board()
+        self.chessbot = chessbot.ChessBot(bot_level)
         self.turn = "white"
         self.selected_piece = None
         self.theme = constants.BoardTheme.NORMAL
@@ -27,6 +28,15 @@ class Game:
         if self.black_player == constants.PlayerType.HUMAN and \
             self.white_player == constants.PlayerType.BOT:
             self.board_flipped = True
+
+        self.on_start_of_turn()
+
+    def on_start_of_turn(self):
+        for row in self.board:
+            for piece in row:
+                if piece is not None:
+                    if piece.color == self.turn:
+                        piece.on_start_of_turn()
     
     def _render_board_square(self, color, pos, screen):
         x, y = pos[1]*constants.SQUARE_WIDTH, pos[0]*constants.SQUARE_WIDTH
@@ -45,7 +55,7 @@ class Game:
         else:
             raise Exception(f"Value {self.theme} is not a board theme")
         
-        if (self._calc_row(pos[0]), pos[1]) in self.highlighted:
+        if (self._calc_row(pos[0]), self._calc_col(pos[1])) in self.highlighted:
             screen.blit(highlighted_square, (x, y))
             return
 
@@ -58,6 +68,11 @@ class Game:
         if self.board_flipped:
             return 7-row
         return row
+    
+    def _calc_col(self, col):
+        if self.board_flipped:
+            return 7-col
+        return col
 
     def _move_piece(self, start_pos, end_pos):
         self.board.move_piece(start_pos, end_pos)
@@ -88,21 +103,17 @@ class Game:
         if self.get_current_player() == constants.PlayerType.BOT:
             self.bot_timer.start()
         
-        for row in self.board:
-            for piece in row:
-                if piece is not None:
-                    if piece.color == self.turn:
-                        piece.on_start_of_turn()
+        self.on_start_of_turn()      
 
     def get_mouse_board_pos(self):
         mouse_pos = pygame.mouse.get_pos()
         col = mouse_pos[0]//constants.SQUARE_WIDTH
         row = mouse_pos[1]//constants.SQUARE_WIDTH
-        row = self._calc_row(row)
+        row, col = self._calc_row(row), self._calc_col(col)
         return row, col
         
     def on_click(self):
-        if self.get_current_player() == constants.PlayerType.HUMAN:
+        if self.get_current_player() == constants.PlayerType.HUMAN and self.human_timer.get() == 0:
             moves = []
             if self.selected_piece:
                 moves = self.board.get_moves(self.selected_piece)
@@ -134,33 +145,24 @@ class Game:
         if self.human_timer.get() == 0:
             if self.get_current_player() == constants.PlayerType.BOT and self.bot_timer.passed(constants.BOT_DELAY):
                 self.bot_timer.reset()
-                maximize = True
-                if self.turn == "black":
-                    maximize = False
                 timer = windowgui.Timer()
                 timer.start()
-                _, start_pos, end_pos = minimax.minimax(self.board, self.bot_level, maximize)
+                start_pos, end_pos = self.chessbot.run(self.board, self.turn)
                 time = timer.get()
-                score = minimax.get_board_score(self.board)
-                print(f"Bot time: {time}, Board score {score}")
+                score = chessbot.get_board_score(self.board)
+                # print(f"Bot time: {time}, Board score {score}")
                 self._move_piece(start_pos, end_pos)
             
     def render(self, screen):
         for row in range(8):
             for col in range(8):
                 x, y = col*constants.SQUARE_WIDTH, row*constants.SQUARE_WIDTH
-                if not self.board_flipped:
-                    if (row + col) % 2 == 0:
-                        self._render_board_square("white", (row, col), screen)
-                    else:
-                        self._render_board_square("black", (row, col), screen)
+                if (row + col) % 2 == 0:
+                    self._render_board_square("white", (row, col), screen)
                 else:
-                    if (row + col) % 2 == 0:
-                        self._render_board_square("black", (row, col), screen)
-                    else:
-                        self._render_board_square("white", (row, col), screen)
+                    self._render_board_square("black", (row, col), screen)
                 
-                row = self._calc_row(row)
+                row, col = self._calc_row(row), self._calc_col(col)
                 piece = self.board[row][col]
                 if piece:
                     screen.blit(piece.get_image(), (x, y))
@@ -177,7 +179,7 @@ class Game:
             big_circle.set_alpha(100)
             
             for move in moves:
-                x, y = move[1]*constants.SQUARE_WIDTH, \
+                x, y = self._calc_col(move[1])*constants.SQUARE_WIDTH, \
                     self._calc_row(move[0])*constants.SQUARE_WIDTH
                 if self.board[move[0]][move[1]]:
                     screen.blit(big_circle, (x, y))
@@ -190,7 +192,7 @@ class Game:
         return self.black_player
   
     def is_over(self):
-        if self.board.is_checkmated(self.turn) or self.board.is_stalemated(self.turn):
+        if self.board.is_game_over():
             return True
         return False
         

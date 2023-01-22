@@ -1,15 +1,15 @@
 import assets 
 
+
 class Piece:
     def __init__(self, color, name):
         self.color = color
         self.name = name
         self.moved = False
-
         self._last_move_occupied = False
     
     def __repr__(self):
-        return self.color + " " + self.name
+        return self.name[0].upper() + self.name[1:] + "(\"" + self.color + "\")"
     
     def get_image(self):
         return assets.IMAGES[self.color + "_" + self.name]
@@ -105,3 +105,4 @@ class Piece:
             if self._last_move_occupied and not jumps:
                 break
         return moves
+

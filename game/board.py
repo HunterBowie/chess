@@ -2,19 +2,10 @@ import copy, math
 from game.pieces import Rook, Bishop, King, Queen, Knight, Pawn, Centaur, Piece, Jester, CursedPawn
 
 class Board:
-    def __init__(self):
-        # self._board = [[None for i in range(8)] for i in range(8)]
-        self._board = [
-            [None, King("black"), None, None, Rook("black"), Rook("black"), None, None],
-            [None, Pawn("black"), Pawn("black"), None, None, None, Pawn("black"), Pawn("black")],
-            [Pawn("black"), None, None, Pawn("black"), None, None, None, None],
-            [Pawn("white"), None, None, Knight("white"), Knight("black"), Knight("black"), None, Queen("black")],
-            [None, None, Pawn("white"), None, None, None, None, None],
-            [None, None, None, None, None, None, None, Pawn("white")],
-            [None, Pawn("white"), Queen("white"), Knight("white"), None, Pawn("white"), Pawn("white"), None],
-            [None, None, None, Rook("white"), Rook("white"), None, King("white"), None],
-        ]
-        # self._init_pieces()
+    def __init__(self, setup = True):
+        self._board = [[None for i in range(8)] for i in range(8)]
+        if setup:
+            self._init_pieces()
 
     def _init_pieces(self):
         self._init_back_row(0, "black")
@@ -103,7 +94,7 @@ class Board:
                 side_pawns.append(piece)
         if col + 1 <= 7:
             piece = self[row][col+1]
-            if type(piece) is Pawn:
+            if piece.name == "pawn":
                 side_pawns.append(piece)
         
         if not side_pawns:
@@ -222,6 +213,6 @@ class Board:
         return False
 
     def copy(self):
-        board_copy = Board()
+        board_copy = Board(setup=False)
         board_copy._board = copy.deepcopy(self._board)
         return board_copy

@@ -4,8 +4,6 @@ import windowgui, constants
 CURRENT_DIR = path.dirname(__file__)
 IMAGES_DIR = path.join(CURRENT_DIR, "images")
 
-
-
 IMAGES = {
     "white_square": windowgui.load_image("white_square", IMAGES_DIR),
     "black_square": windowgui.load_image("black_square", IMAGES_DIR),
@@ -21,6 +19,8 @@ IMAGES = {
     "black_bishop": windowgui.load_image("black_bishop", IMAGES_DIR),
     "white_pawn": windowgui.load_image("white_pawn", IMAGES_DIR),
     "black_pawn": windowgui.load_image("black_pawn", IMAGES_DIR),
+    "white_cursed_pawn": windowgui.load_image("white_pawn", IMAGES_DIR),
+    "black_cursed_pawn": windowgui.load_image("black_pawn", IMAGES_DIR),
     "black_centaur": windowgui.load_image("black_centaur", IMAGES_DIR),
     "white_centaur": windowgui.load_image("white_centaur", IMAGES_DIR),
     "white_jester":  windowgui.load_image("white_jester", IMAGES_DIR, scale=(constants.SQUARE_WIDTH, constants.SQUARE_WIDTH)),

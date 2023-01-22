@@ -18,14 +18,18 @@ def get_board_score(board: Board):
 
 
 def get_piece_score(piece: Piece, board: Board):
-    score = scoring[piece.name]
+    try:
+        score = scoring[piece.name]
     
-    position = positional_scores[piece.name].copy()
-    if piece.color == "black":
-        position.reverse()
+        position = positional_scores[piece.name].copy()
+        if piece.color == "black":
+            position.reverse()
 
-    row, col = board.get_pos(piece)
-    score += position[row][col]
+        row, col = board.get_pos(piece)
+        score += position[row][col]
+
+    except KeyError:
+        return 0
 
     if piece.color == "black":
         return -score
@@ -38,6 +42,11 @@ scoring = {
     "rook": 500,
     "queen": 900,
     "king": 0,
+
+
+    "jester": 0,
+    "centaur": 0,
+    "cursed_pawn": 0
 }
 
 positional_scores = {
